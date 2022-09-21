@@ -21,6 +21,7 @@ class ModelClass:
         # 获取yaml配置文件
         config_file = open(r'config/config.yaml', 'r', encoding='utf-8')
         config_content = config_file.read()
+        self.model = ''
         self.config = yaml.load(config_content, Loader=yaml.FullLoader)
         # 定义标签
         self.label = ['normal', 'apnea']
@@ -119,32 +120,42 @@ class ModelClass:
         # 定义输入层（通道数及名称）
         inputs = Input(shape=(60000, 1), name='inputs')
         # 定义第一卷积层，输入为输入层数据
-        Layer_1_Conv1 = Conv1D(filters=64, kernel_size=5, strides=1, activation='relu', name="Layer_1_Convolution1")(inputs)
-        Layer_1_Conv2 = Conv1D(filters=128, kernel_size=5, strides=1, activation='relu', name="Layer_1_Convolution2")(Layer_1_Conv1)
+        Layer_1_Conv1 = Conv1D(filters=64, kernel_size=5, strides=1, activation='relu', name="Layer_1_Convolution1")(
+            inputs)
+        Layer_1_Conv2 = Conv1D(filters=128, kernel_size=5, strides=1, activation='relu', name="Layer_1_Convolution2")(
+            Layer_1_Conv1)
         Layer_1_BatchNorm = BatchNormalization()(Layer_1_Conv2)
         Layer_1_Pool = MaxPooling1D(pool_size=2, strides=2)(Layer_1_BatchNorm)
         Layer_1_Drop = Dropout(rate=0.3)(Layer_1_Pool)
 
-        Layer_2_Conv1 = Conv1D(filters=128, kernel_size=7, strides=1, activation='relu', name="Layer_2_Convolution1")(Layer_1_Drop)
-        Layer_2_Conv2 = Conv1D(filters=256, kernel_size=7, strides=1, activation='relu', name="Layer_2_Convolution2")(Layer_2_Conv1)
+        Layer_2_Conv1 = Conv1D(filters=128, kernel_size=7, strides=1, activation='relu', name="Layer_2_Convolution1")(
+            Layer_1_Drop)
+        Layer_2_Conv2 = Conv1D(filters=256, kernel_size=7, strides=1, activation='relu', name="Layer_2_Convolution2")(
+            Layer_2_Conv1)
         Layer_2_BatchNorm = BatchNormalization()(Layer_2_Conv2)
         Layer_2_Pool = MaxPooling1D(pool_size=2, strides=2)(Layer_2_BatchNorm)
         Layer_2_Drop = Dropout(rate=0.3)(Layer_2_Pool)
 
-        Layer_3_Conv1 = Conv1D(filters=256, kernel_size=7, strides=1, activation='relu', name="Layer_3_Convolution1")(Layer_2_Drop)
-        Layer_3_Conv2 = Conv1D(filters=64, kernel_size=7, strides=1, activation='relu', name="Layer_3_Convolution2")(Layer_3_Conv1)
+        Layer_3_Conv1 = Conv1D(filters=256, kernel_size=7, strides=1, activation='relu', name="Layer_3_Convolution1")(
+            Layer_2_Drop)
+        Layer_3_Conv2 = Conv1D(filters=64, kernel_size=7, strides=1, activation='relu', name="Layer_3_Convolution2")(
+            Layer_3_Conv1)
         Layer_3_BatchNorm = BatchNormalization()(Layer_3_Conv2)
         Layer_3_Pool = MaxPooling1D(pool_size=2, strides=2)(Layer_3_BatchNorm)
         Layer_3_Drop = Dropout(rate=0.3)(Layer_3_Pool)
 
-        Layer_4_Conv1 = Conv1D(filters=256, kernel_size=7, strides=1, activation='relu', name="Layer_4_Convolution1")(Layer_3_Drop)
-        Layer_4_Conv2 = Conv1D(filters=64, kernel_size=7, strides=1, activation='relu', name="Layer_4_Convolution2")(Layer_4_Conv1)
+        Layer_4_Conv1 = Conv1D(filters=256, kernel_size=7, strides=1, activation='relu', name="Layer_4_Convolution1")(
+            Layer_3_Drop)
+        Layer_4_Conv2 = Conv1D(filters=64, kernel_size=7, strides=1, activation='relu', name="Layer_4_Convolution2")(
+            Layer_4_Conv1)
         Layer_4_BatchNorm = BatchNormalization()(Layer_4_Conv2)
         Layer_4_Pool = MaxPooling1D(pool_size=2, strides=2)(Layer_4_BatchNorm)
         Layer_4_Drop = Dropout(rate=0.3)(Layer_4_Pool)
 
-        Layer_5_Conv1 = Conv1D(filters=8, kernel_size=2, strides=1, activation='relu', name="Layer_5_Convolution1")(Layer_4_Drop)
-        Layer_5_Conv2 = Conv1D(filters=8, kernel_size=2, strides=1, activation='relu', name="Layer_5_Convolution2")(Layer_5_Conv1)
+        Layer_5_Conv1 = Conv1D(filters=8, kernel_size=2, strides=1, activation='relu', name="Layer_5_Convolution1")(
+            Layer_4_Drop)
+        Layer_5_Conv2 = Conv1D(filters=8, kernel_size=2, strides=1, activation='relu', name="Layer_5_Convolution2")(
+            Layer_5_Conv1)
         Layer_5_BatchNorm = BatchNormalization()(Layer_5_Conv2)
         Layer_5_Pool = MaxPooling1D(pool_size=2, strides=2)(Layer_5_BatchNorm)
         Layer_5_Drop = Dropout(rate=0.3)(Layer_5_Pool)
@@ -211,9 +222,9 @@ class ModelClass:
         result = []
         for x in predict:
             if x[0] >= x[1]:
-                result.append([1,0])
+                result.append([1, 0])
             else:
-                result.append([0,1])
+                result.append([0, 1])
         result = numpy.asarray(result)
         sum = len(result)
         correct = 0
@@ -223,3 +234,25 @@ class ModelClass:
         acc = correct / sum
         print(acc)
         return acc
+
+    def load_model(self):
+        filename_str = '{}new_trained_{}_{}_bs_{}_epochs_{}{}'
+        self.model = load_model(filename_str.format(self.config['model']['model_dir'],
+                                                    self.config['model']['optimizer'],
+                                                    self.config['model']['loss'],
+                                                    self.config['model']['batch'],
+                                                    self.config['model']['epochs'],
+                                                    self.config['model']['model_format']))
+
+    def target_detect(self, path):
+        x = []
+        data = scipy_io.loadmat(path)["data"]
+        x.append(self.normalize(data))
+        x = numpy.array(x, dtype=numpy.float32)
+        predict = self.model.predict(x)
+        predict = predict.tolist()
+        if predict[0][0] >= predict[0][1]:
+            result = 'normal'
+        else:
+            result = 'apnea'
+        return result

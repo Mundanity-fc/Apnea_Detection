@@ -4,3 +4,4 @@ pyyaml
 pydot
 keras == 2.3.1
 tensorflow == 1.14
+websockets

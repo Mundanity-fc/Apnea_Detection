@@ -1,6 +1,6 @@
-/data/test/noraml/*
+/data/test/normal/*
 /data/test/apnea/*
-/data/train/noraml/*
+/data/train/normal/*
 /data/train/apnea/*
 /data/validation/normal/*
 /data/validation/apnea/*

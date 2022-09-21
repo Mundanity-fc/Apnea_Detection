@@ -194,10 +194,8 @@ class ModelClass:
             pickle.dump(history.history, f)
         print('已将模型记录保存到：%s ' % history_file)
 
-    def predict_validation(self) -> str:
+    def predict_testset(self) -> str:
         """
-        对根目录下的verifycode.jpg进行预测
-        从而判断模型
         :return: 预测的结果
         """""
         filename_str = '{}new_trained_{}_{}_bs_{}_epochs_{}{}'
@@ -207,10 +205,21 @@ class ModelClass:
                                                self.config['model']['batch'],
                                                self.config['model']['epochs'],
                                                self.config['model']['model_format']))
-        data = []
-        data = numpy.array(data, dtype=numpy.float32)
-        data = data / 255
-        data = data.reshape(data.shape[0], self.config['dataset']['height'], self.config['dataset']['width'], 1)
-        predict = model.predict(data)
-        result = self.to_string(predict.tolist())
-        return result
+        x_test, y_test = self.init_test_data()
+        predict = model.predict(x_test)
+        predict = predict.tolist()
+        result = []
+        for x in predict:
+            if x[0] >= x[1]:
+                result.append([1,0])
+            else:
+                result.append([0,1])
+        result = numpy.asarray(result)
+        sum = len(result)
+        correct = 0
+        for x in range(sum):
+            if y_test[x] == result[x]:
+                correct += 1
+        acc = correct / sum
+        print(acc)
+        return acc

@@ -1,0 +1,13 @@
+dataset:
+  train_dir: data/train/
+  validation_dir: data/validation/
+  test_dir: data/test/
+model:
+  model_dir: model/
+  model_format: .h5
+  history_dir: model/history/
+  history_format: .history
+  optimizer: adam
+  loss: binary_crossentropy
+  batch: 4
+  epochs: 50

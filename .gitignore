@@ -1,7 +1,7 @@
-data/test/noraml/*
-data/test/apnea/*
-data/train/noraml/*
-data/train/apnea/*
-data/validation/normal/*
-data/validation/apnea/*
-.idea
+/data/test/noraml/*
+/data/test/apnea/*
+/data/train/noraml/*
+/data/train/apnea/*
+/data/validation/normal/*
+/data/validation/apnea/*
+/.idea

@@ -1,3 +1,3 @@
 import os
 
-os.path.exists('runtime.')
+print(os.path.dirname(os.path.abspath(__file__)))

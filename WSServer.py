@@ -5,12 +5,12 @@ from ModelClass import ModelClass
 
 model = ModelClass()
 model.load_model()
-
+workdir = os.path.dirname(os.path.abspath(__file__)) + '/'
 
 async def recv_msg(websocket):
     while True:
         recv_text = await websocket.recv()
-        if os.path.exists("runtime/"+recv_text):
+        if os.path.exists(workdir + "runtime/"+recv_text):
             response_text = model.target_detect("runtime/"+recv_text)
         else:
             response_text = "没有该文件"

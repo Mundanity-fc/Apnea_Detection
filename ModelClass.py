@@ -17,9 +17,11 @@ class ModelClass:
     
     """""
 
+    workdir = os.path.dirname(os.path.abspath(__file__)) + '/'
+
     def __init__(self):
         # 获取yaml配置文件
-        config_file = open(r'config/config.yaml', 'r', encoding='utf-8')
+        config_file = open(self.workdir+'config/config.yaml', 'r', encoding='utf-8')
         config_content = config_file.read()
         self.model = ''
         self.config = yaml.load(config_content, Loader=yaml.FullLoader)
@@ -39,18 +41,18 @@ class ModelClass:
         :return: x_train—数据集 y_train-标签集
         """""
         train_dir = self.config['dataset']['train_dir']
-        normal_list = os.listdir(train_dir + "normal/")
-        apnea_list = os.listdir(train_dir + "apnea/")
+        normal_list = os.listdir(self.workdir + train_dir + "normal/")
+        apnea_list = os.listdir(self.workdir + train_dir + "apnea/")
         x_train = []
         y_train = []
         for x in normal_list:
             if x.endswith('.mat'):
-                data = scipy_io.loadmat(train_dir + "normal/" + x)["data"]
+                data = scipy_io.loadmat(self.workdir + train_dir + "normal/" + x)["data"]
                 x_train.append(self.normalize(data))
                 y_train.append([1, 0])
         for x in apnea_list:
             if x.endswith('.mat'):
-                data = scipy_io.loadmat(train_dir + "apnea/" + x)["data"]
+                data = scipy_io.loadmat(self.workdir + train_dir + "apnea/" + x)["data"]
                 x_train.append(self.normalize(data))
                 y_train.append([0, 1])
         y_train = list(y_train)
@@ -64,18 +66,18 @@ class ModelClass:
         :return: x_test—数据集 y_test-标签集
         """""
         test_dir = self.config['dataset']['test_dir']
-        normal_list = os.listdir(test_dir + "normal/")
-        apnea_list = os.listdir(test_dir + "apnea/")
+        normal_list = os.listdir(self.workdir + test_dir + "normal/")
+        apnea_list = os.listdir(self.workdir + test_dir + "apnea/")
         x_test = []
         y_test = []
         for x in normal_list:
             if x.endswith('.mat'):
-                data = scipy_io.loadmat(test_dir + "normal/" + x)["data"]
+                data = scipy_io.loadmat(self.workdir + test_dir + "normal/" + x)["data"]
                 x_test.append(self.normalize(data))
                 y_test.append([1, 0])
         for x in apnea_list:
             if x.endswith('.mat'):
-                data = scipy_io.loadmat(test_dir + "apnea/" + x)["data"]
+                data = scipy_io.loadmat(self.workdir + test_dir + "apnea/" + x)["data"]
                 x_test.append(self.normalize(data))
                 y_test.append([0, 1])
         y_test = list(y_test)
@@ -89,18 +91,18 @@ class ModelClass:
         :return: x_vali—数据集 y_vali-标签集
         """""
         validation_dir = self.config['dataset']['validation_dir']
-        normal_list = os.listdir(validation_dir + "normal/")
-        apnea_list = os.listdir(validation_dir + "apnea/")
+        normal_list = os.listdir(self.workdir + validation_dir + "normal/")
+        apnea_list = os.listdir(self.workdir + validation_dir + "apnea/")
         x_vali = []
         y_vali = []
         for x in normal_list:
             if x.endswith('.mat'):
-                data = scipy_io.loadmat(validation_dir + "normal/" + x)["data"]
+                data = scipy_io.loadmat(self.workdir + validation_dir + "normal/" + x)["data"]
                 x_vali.append(self.normalize(data))
                 y_vali.append([1, 0])
         for x in apnea_list:
             if x.endswith('.mat'):
-                data = scipy_io.loadmat(validation_dir + "apnea/" + x)["data"]
+                data = scipy_io.loadmat(self.workdir + validation_dir + "apnea/" + x)["data"]
                 x_vali.append(self.normalize(data))
                 y_vali.append([0, 1])
         y_vali = list(y_vali)
@@ -175,7 +177,7 @@ class ModelClass:
         # 控制台输出模型的摘要
         print(model.summary())
         # 导出模型的结构
-        plot_model(model, to_file='asset/model_structure.jpg', show_shapes=True)
+        plot_model(model, to_file=self.workdir + 'asset/model_structure.jpg', show_shapes=True)
         # 开始训练模型
         history = model.fit(x_train,
                             y_train,
@@ -184,7 +186,7 @@ class ModelClass:
                             verbose=2,
                             validation_data=(x_vali, y_vali))
         # 定义模型文件名与记录文件名
-        filename_str = '{}new_trained_{}_{}_bs_{}_epochs_{}{}'
+        filename_str = self.workdir + '{}new_trained_{}_{}_bs_{}_epochs_{}{}'
         current_model_file = filename_str.format(self.config['model']['model_dir'],
                                                  self.config['model']['optimizer'],
                                                  self.config['model']['loss'],
@@ -209,7 +211,7 @@ class ModelClass:
         """
         :return: 预测的结果
         """""
-        filename_str = '{}new_trained_{}_{}_bs_{}_epochs_{}{}'
+        filename_str = self.workdir + '{}new_trained_{}_{}_bs_{}_epochs_{}{}'
         model = load_model(filename_str.format(self.config['model']['model_dir'],
                                                self.config['model']['optimizer'],
                                                self.config['model']['loss'],
@@ -236,7 +238,7 @@ class ModelClass:
         return acc
 
     def load_model(self):
-        filename_str = '{}new_trained_{}_{}_bs_{}_epochs_{}{}'
+        filename_str = self.workdir + '{}new_trained_{}_{}_bs_{}_epochs_{}{}'
         self.model = load_model(filename_str.format(self.config['model']['model_dir'],
                                                     self.config['model']['optimizer'],
                                                     self.config['model']['loss'],

@@ -1,4 +1,5 @@
 import socket
+import os
 
 # 总体参数
 IP = "127.0.0.1"
@@ -6,6 +7,7 @@ PORT = 4455
 ADDR = (IP, PORT)
 FORMAT = "utf-8"
 SIZE = 512000
+workdir = os.path.dirname(os.path.abspath(__file__)) + '/'
 
 
 def main():
@@ -19,7 +21,7 @@ def main():
         print(f"[新的连接] {addr} 已连接至本服务器")
         filename = conn.recv(SIZE).decode(FORMAT)
         print(f"[获取] 获取到指定文件名")
-        file = open('runtime/'+filename, "wb")
+        file = open(workdir + 'runtime/'+filename, "wb")
         conn.send("文件开始接收".encode(FORMAT))
         data = conn.recv(SIZE)
         print(f"[获取] 获取到指定文件内容")

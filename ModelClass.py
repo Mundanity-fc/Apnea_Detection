@@ -252,7 +252,7 @@ class ModelClass:
         predict = self.model.predict(x)
         predict = predict.tolist()
         if predict[0][0] >= predict[0][1]:
-            result = 'normal'
+            result = '正常呼吸'
         else:
-            result = 'apnea'
+            result = '呼吸暂停'
         return result

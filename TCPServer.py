@@ -1,11 +1,11 @@
 import socket
 
 # 总体参数
-IP = socket.gethostbyname(socket.gethostname())
+IP = input("请键入接受的IP地址：")
 PORT = 4455
 ADDR = (IP, PORT)
-SIZE = 512000
 FORMAT = "utf-8"
+SIZE = 512000
 
 
 def main():
@@ -19,7 +19,7 @@ def main():
         print(f"[新的连接] {addr} 已连接至本服务器")
         filename = conn.recv(SIZE).decode(FORMAT)
         print(f"[获取] 获取到指定文件名")
-        file = open(filename, "wb")
+        file = open('runtime/'+filename, "wb")
         conn.send("文件开始接收".encode(FORMAT))
         data = conn.recv(SIZE)
         print(f"[获取] 获取到指定文件内容")

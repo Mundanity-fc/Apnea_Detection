@@ -1,7 +1,7 @@
 import socket
 
 # 总体参数
-IP = socket.gethostbyname(socket.gethostname())
+IP = input("请键入目标IP：")
 PORT = 4455
 ADDR = (IP, PORT)
 FORMAT = "utf-8"

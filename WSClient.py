@@ -1,6 +1,8 @@
 import asyncio
 import websockets
 
+ip = input("请键入目标主机IP：")
+
 
 async def send_msg(websocket):
     while True:
@@ -15,7 +17,7 @@ async def send_msg(websocket):
 
 
 async def main_logic():
-    async with websockets.connect("ws://127.0.0.1:9898") as websocket:
+    async with websockets.connect("ws://" + ip + ":9898") as websocket:
         await send_msg(websocket)
 
 

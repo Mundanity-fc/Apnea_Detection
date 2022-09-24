@@ -1,7 +1,7 @@
 import socket
 
 # 总体参数
-IP = input("请键入接受的IP地址：")
+IP = "127.0.0.1"
 PORT = 4455
 ADDR = (IP, PORT)
 FORMAT = "utf-8"
